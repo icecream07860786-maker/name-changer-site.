@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NAME CHANGER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Dancing+Script&family=Fjalla+One&family=Lobster&family=Shadows+Into+Light&family=Pacifico&family=Orbitron&family=Indie+Flower&family=Press+Start+2P&family=Permanent+Marker&family=Rubik+Moonrocks&family=Architects+Daughter&family=Tilt+Prism&family=Righteous&family=Rock+Salt&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Fjalla One', sans-serif;
+      color: #fff;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientShift 10s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+      transition: background 0.3s ease;
+    }
+    body.dark-mode {
+      background: black;
+      color: white;
+    }
+    body.dark-mode::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif') repeat;
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: -1;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+      font-size: 2.5rem;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+    input, select, button {
+      margin: 1rem;
+      padding: 0.5rem;
+    }
+    #result {
+      margin-top: 2rem;
+      font-size: 3rem;
+      text-shadow: 0 0 10px #fff, 0 0 20px #f0f, 0 0 30px #0ff;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    button {
+      background-color: #222;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      transition: box-shadow 0.3s ease;
+    }
+    button:hover {
+      box-shadow: 0 0 15px #0ff, 0 0 30px #f0f;
+    }
+    #typingEffect {
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 5s steps(80, end) infinite alternate;
+    }
+    #status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      animation: fadeIn 0.5s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <audio id="typeSound" src="https://www.fesliyanstudios.com/play-mp3/6962" preload="auto"></audio>
+  <div id="tsparticles"></div>
+  <div id="status"></div>
+  <header>
+    NAME CHANGER
+    <div id="typingEffect">Create Stunning Font Styles with Ease</div>
+  </header>
+  <div class="container">
+    <input type="text" id="nameInput" placeholder="Enter Your Name" />
+    <select id="fontSelect">
+      <option value="Anton">Modern - Anton</option>
+      <option value="Bangers">Comic - Bangers</option>
+      <option value="Dancing Script">Script - Dancing Script</option>
+      <option value="Lobster">Fancy - Lobster</option>
+      <option value="Fjalla One">Bold - Fjalla One</option>
+      <option value="Shadows Into Light">Handwritten - Shadows Into Light</option>
+      <option value="Pacifico">Smooth - Pacifico</option>
+      <option value="Orbitron">Tech - Orbitron</option>
+      <option value="Indie Flower">Sketch - Indie Flower</option>
+      <option value="Press Start 2P">Pixel - Press Start 2P</option>
+      <option value="Permanent Marker">Graffiti - Permanent Marker</option>
+      <option value="Rubik Moonrocks">Futuristic - Rubik Moonrocks</option>
+      <option value="Architects Daughter">Cute - Architects Daughter</option>
+      <option value="Tilt Prism">3D - Tilt Prism</option>
+      <option value="Righteous">Sharp - Righteous</option>
+      <option value="Rock Salt">Rough - Rock Salt</option>
+    </select>
+    <input type="color" id="colorPicker" />
+    <input type="color" id="shadowPicker" />
+    <input type="range" id="fontSize" min="20" max="100" value="48" />
+    <br>
+    <button onclick="generateFont()">Generate Font Style</button>
+    <button onclick="copyText()">Copy</button>
+    <button onclick="downloadAsImage()">Download as Image</button>
+    <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <button onclick="generateAIImage()">Generate AI Image</button>
+    <div id="result"></div>
+    <div id="aiImageResult"></div>
+  </div>
+  <script>
+    tsParticles.load("tsparticles", {
+      fullScreen: { enable: true, zIndex: -2 },
+      particles: {
+        number: { value: 150 },
+        size: { value: 1.5 },
+        move: { enable: true, speed: 1.2, straight: false, out_mode: "out" },
+        opacity: { value: 0.6 },
+        color: { value: ["#ffffff", "#ff00ff", "#00ffff", "#00ff00"] },
+        links: {
+          enable: true,
+          distance: 100,
+          color: "#ffffff",
+          opacity: 0.3,
+          width: 1
+        }
+      },
+      background: { color: "transparent" }
+    });
+
+    const result = document.getElementById('result');
+    const aiImageResult = document.getElementById('aiImageResult');
+
+    document.getElementById('nameInput').addEventListener('input', () => {
+      document.getElementById('typeSound').play();
+      localStorage.setItem('savedName', document.getElementById('nameInput').value);
+    });
+
+    function generateFont() {
+      const name = document.getElementById('nameInput').value;
+      const font = document.getElementById('fontSelect').value;
+      const color = document.getElementById('colorPicker').value;
+      const size = document.getElementById('fontSize').value + 'px';
+      const shadow = document.getElementById('shadowPicker').value;
+
+      result.style.fontFamily = font;
+      result.style.color = color;
+      result.style.fontSize = size;
+      result.style.textShadow = `2px 2px 10px ${shadow}`;
+      result.innerText = name;
+    }
+
+    function copyText() {
+      navigator.clipboard.writeText(result.innerText).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    function downloadAsImage() {
+      html2canvas(result).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'styled_name.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    function generateAIImage() {
+      const name = document.getElementById('nameInput').value;
+      aiImageResult.innerHTML = `<img src="https://dummyimage.com/600x200/000/fff&text=${encodeURIComponent(name)}+AI+Image" alt="AI Generated" style="margin-top:20px; max-width:100%; border-radius: 10px; box-shadow: 0 0 10px rgba(255,255,255,0.5);" />`;
+    }
+
+    function updateOnlineStatus() {
+      const status = document.getElementById('status');
+      status.textContent = navigator.onLine ? 'Online' : 'Offline';
+      status.style.backgroundColor = navigator.onLine ? 'green' : 'red';
+      status.style.color = 'white';
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    window.onload = () => {
+      const saved = localStorage.getItem('savedName');
+      if (saved) {
+        document.getElementById('nameInput').value = saved;
+        generateFont();
+      }
+      const darkPref = localStorage.getItem('darkMode') === 'true';
+      if (darkPref) document.body.classList.add('dark-mode');
+    };
+  </script>
+</body>
+</html>
